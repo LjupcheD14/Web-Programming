@@ -37,16 +37,20 @@ public class MovieRepository  {
 
     //returns the requested movies that have the title/summary
 
-    public List<Movie> searchMovies(String text, double rating){
+    public List<Movie> searchMovies(String text, double rating) {
         List<Movie> searchResults = new ArrayList<>();
-        for (int i=0; i< movies.size(); i++){
-            if(movies.get(i).title.contains(text)){
-                if(movies.get(i).rating >= rating) {
+        String searchTextLower = text.toLowerCase(); // Convert search text to lowercase
+        for (int i = 0; i < movies.size(); i++) {
+            String movieTitleLower = movies.get(i).title.toLowerCase(); // Convert movie title to lowercase
+            if (movieTitleLower.contains(searchTextLower)) {
+                if (movies.get(i).rating >= rating) {
                     searchResults.add(movies.get(i));
                 }
-            }}
+            }
+        }
         return searchResults;
     }
+
 
 
 }
