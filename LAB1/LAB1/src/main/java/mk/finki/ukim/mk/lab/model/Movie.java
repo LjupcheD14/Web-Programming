@@ -11,4 +11,5 @@ public class Movie {
     public String title;
     public String summary;
     public double rating;
+    private long id;
 }
