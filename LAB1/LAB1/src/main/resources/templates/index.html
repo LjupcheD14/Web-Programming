@@ -48,16 +48,23 @@
             <label th:text="'ID: ' + ${movie.id}" ></label>
             </br>
             <label th:text="'Production: ' + ${movie.production}" ></label>
+
+            <!-- Button to edit the movie -->
+            <a th:href="@{'/editMovie/' + ${movie.id}}" class="btn btn-primary">Edit</a>
+
+            <!-- Button to delete the movie (use a form for safety) -->
+            <form action="@{'/deleteMovie/' + ${movie.id}}" method="post">
+                <input type="submit" class="btn btn-danger" value="Delete" onclick="return confirm('Are you sure?');">
+            </form>
+
             <hr>
             </br>
-
         </div>
 
-        <h2>Choose number of tickets:</h2>
+        <h2>Choose the number of tickets:</h2>
         <input type="number" th:name="numTickets" name="numTickets" min="1" max="10"><br/><br/>
         <input type="submit" value="Submit">
     </form>
 </main>
 </body>
 </html>
-
