@@ -12,4 +12,13 @@ public class Movie {
     public String summary;
     public double rating;
     private long id;
+    private Production production; // Reference to Production class
+
+    public Production getProduction() {
+        return production;
+    }
+
+    public void setProduction(Production production) {
+        this.production = production;
+    }
 }
