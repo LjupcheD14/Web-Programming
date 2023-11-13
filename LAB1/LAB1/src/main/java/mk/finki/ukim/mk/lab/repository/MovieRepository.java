@@ -2,61 +2,76 @@ package mk.finki.ukim.mk.lab.repository;
 
 import mk.finki.ukim.mk.lab.model.Movie;
 import mk.finki.ukim.mk.lab.model.Production;
-import mk.finki.ukim.mk.lab.service.MovieService;
 import org.springframework.stereotype.Repository;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Repository //annotation that lets the server know that this is a repo
-public class MovieRepository  {
+@Repository
+public class MovieRepository {
+    List<Movie> movies;
+    private final ProductionRepository productionRepository;
 
-    //kreiranje lista od filmovi
-    public static List<Movie> movies = new ArrayList<>();
-    public static List<Production> productions = new ArrayList<>();
+    public MovieRepository(ProductionRepository productionRepository) {
+        this.productionRepository = productionRepository;
+        initializeMovieList();
 
-
-    //incijaliziranje na 10 filmovi vo konstruktor na MovieRepository, toa znaci koga ke se kreira ovoj repo avtomatski ke ima 10 filmovi vnatre
-    public MovieRepository(ProductionRepository productionRepository){
-        movies = new ArrayList<>();
-//        productions = new ArrayList<>();
-        List<Production> productions = productionRepository.findAll();
-        movies.add(new Movie("Catch Me If You Can ", "Barely 21 yet, Frank is a skilled forger who has passed as a doctor, lawyer and pilot. FBI agent Carl becomes obsessed with tracking down the con man, who only revels in the pursuit.",8.0, 1, productions.get(0)));
-        movies.add(new Movie("The Current War", "The dramatic story of the cutthroat race between electricity titans Thomas A. Edison and George Westinghouse to determine whose electrical system would power the modern world.",7.0, 2, productions.get(1)));
-        movies.add(new Movie("Gone Girl", "With his wife's disappearance having become the focus of an intense media circus, a man sees the spotlight turned on him when it's suspected that he may not be innocent.",9.5, 3, productions.get(2)));
-        movies.add(new Movie("Shutter Island", "Teddy Daniels and Chuck Aule, two US marshals, are sent to an asylum on a remote island in order to investigate the disappearance of a patient, where Teddy uncovers a shocking truth about the place.",10.0, 4, productions.get(3)));
-        movies.add(new Movie("Talk to Me", "When a group of friends discover how to conjure spirits using an embalmed hand, they become hooked on the new thrill, until one of them goes too far and unleashes terrifying supernatural forces.",8.3, 5, productions.get(4)));
-        movies.add(new Movie("Ready Player One", "When the creator of a virtual reality called the OASIS dies, he makes a posthumous challenge to all OASIS users to find his Easter Egg, which will give the finder his fortune and control of his world.",8.3, 6, productions.get(0)));
-        movies.add(new Movie("Tetris", "The story of how one of the world's most popular video games found its way to players around the globe. Businessman Henk Rogers and Tetris inventor Alexey Pazhitnov join forces in the USSR, risking it all to bring it to the masses.",7.8, 7,productions.get(2)));
-        movies.add(new Movie("Knives Out", "A detective investigates the death of the patriarch of an eccentric, combative family.",9.2, 8, productions.get(0)));
-        movies.add(new Movie("The Breakfast Club", "Five high school students meet in Saturday detention and discover how they have a great deal more in common than they thought.",7.2, 9, productions.get(0)));
-        movies.add(new Movie("Avatar: The Way of Water ", "Jake Sully lives with his newfound family formed on the extrasolar moon Pandora. Once a familiar threat returns to finish what was previously started, Jake must work with Neytiri and the army of the Na'vi race to protect their home.",9.7, 10, productions.get(3)));
     }
 
-    //returns the whole list
-    public List<Movie> findAll(){
+
+    private void initializeMovieList() {
+        movies = new ArrayList<>();
+        movies.add(new Movie("Oppenheimer", "The story of American scientist, J. Robert Oppenheimer, and his role in the development of the atomic bomb.", 8.5, productionRepository.productions.get(0)));
+        movies.add(new Movie("Barbie", "Barbie suffers a crisis that leads her to question her world and her existence.", 7.0, productionRepository.productions.get(3)));
+        movies.add(new Movie("Fight Club", "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.", 8.8, productionRepository.productions.get(4)));
+        movies.add(new Movie("Interstellar", "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.", 8.7, productionRepository.productions.get(1)));
+        movies.add(new Movie("The Shawshank Redemption", "Over the course of several years, two convicts form a friendship, seeking consolation and, eventually, redemption through basic compassion.", 9.3, productionRepository.productions.get(3)));
+        movies.add(new Movie("The Dark Knight", "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.", 9.0, productionRepository.productions.get(2)));
+        movies.add(new Movie("Joker", "During the 1980s, a failed stand-up comedian is driven insane and turns to a life of crime and chaos in Gotham City while becoming an infamous psychopathic crime figure.", 8.4, productionRepository.productions.get(3)));
+        movies.add(new Movie("Shutter Island", "Teddy Daniels and Chuck Aule, two US marshals, are sent to an asylum on a remote island in order to investigate the disappearance of a patient, where Teddy uncovers a shocking truth about the place.", 8.2, productionRepository.productions.get(4)));
+        movies.add(new Movie("The Wolf of Wall Street", "Based on the true story of Jordan Belfort, from his rise to a wealthy stock-broker living the high life to his fall involving crime, corruption and the federal government.", 8.2, productionRepository.productions.get(4)));
+        movies.add(new Movie("Memento", "A man with short-term memory loss attempts to track down his wife's murderer.", 8.4, productionRepository.productions.get(0)));
+
+    }
+
+
+    public List<Movie> findAll() {
         return movies;
     }
 
-    //returns the requested movies that have the title/summary
+    public List<Movie> searchMovies(String text) {
+        return movies.stream()
+                .filter(movie -> movie.title.contains(text) || movie.summary.contains(text))
+                .collect(Collectors.toList());
+    }
 
-    public List<Movie> searchMovies(String text, double rating) {
-        List<Movie> searchResults = new ArrayList<>();
-        String searchTextLower = text.toLowerCase(); // Convert search text to lowercase
-        for (int i = 0; i < movies.size(); i++) {
-            String movieTitleLower = movies.get(i).title.toLowerCase(); // Convert movie title to lowercase
-            if (movieTitleLower.contains(searchTextLower)) {
-                if (movies.get(i).rating >= rating) {
-                    searchResults.add(movies.get(i));
-                }
-            }
+    public List<Movie> searchMoviesByRating(int rating) {
+        return movies.stream()
+                .filter(movie -> movie.getRating() >= rating)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<Movie> saveMovie(String movieTitle, String summary, double rating, Production production) {
+        if (production == null) {
+            throw new IllegalArgumentException();
         }
-        return searchResults;
+        Movie movie = new Movie(movieTitle, summary, rating, production);
+        movies.removeIf(m -> m.getTitle().equals(movie.getTitle()));
+        movies.add(movie);
+        return Optional.of(movie);
     }
 
 
+    public Optional<Movie> findById(Long id) {
+        return movies.stream().filter(i -> i.equals(id)).findFirst();
+    }
 
+
+    public void deleteById(Long id) {
+        movies.removeIf(movie -> movie.getId() == id);
+    }
 
 
 }

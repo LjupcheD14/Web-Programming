@@ -15,28 +15,53 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/index", ""})
+@WebServlet
 public class MovieListServlet extends HttpServlet {
-    private final SpringTemplateEngine templateEngine;  //za thymeleaf
+    private final SpringTemplateEngine springTemplateEngine;
     private final MovieService movieService;
 
-    public MovieListServlet(SpringTemplateEngine templateEngine, MovieService movieService) {
-        this.templateEngine = templateEngine;
+    public MovieListServlet(SpringTemplateEngine springTemplateEngine, MovieService movieService) {
+        this.springTemplateEngine = springTemplateEngine;
         this.movieService = movieService;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<Movie> movies = movieService.listAll();  //inicijaliziranje na movies promenliva so site filmovi vnatre
-
         IWebExchange webExchange = JakartaServletWebApplication
                 .buildApplication(getServletContext())
                 .buildExchange(req, resp);
-        WebContext context = new WebContext(webExchange); //web context
 
-        context.setVariable("movies", movies); //mu kazuva na thymeleaf vo index.html deka $movies e movies.
+        WebContext context = new WebContext(webExchange);
+        context.setVariable("movies", movieService.listAll());
+        String searchTitle = req.getParameter("searchMovies");
+        String searchRating = req.getParameter("searchRating");
+        if(searchTitle != null && !searchTitle.isEmpty())
+        {
+            List<Movie> filteredMovies = movieService.searchMovies(searchTitle);
+            context.setVariable("movies", filteredMovies);
+        }
+        else{
+            context.setVariable("movies", movieService.listAll());
+        }
+        if(searchRating != null && !searchRating.isEmpty())
+        {
+            List<Movie> filteredMoviesByRating = movieService.searchMoviesByRating(Integer.parseInt(searchRating));
+            context.setVariable("movies", filteredMoviesByRating);
+        }
 
-        this.templateEngine.process("index.html", context, resp.getWriter()); //prakja na thymeleaf
+        springTemplateEngine.process(
+                "index.html",
+                context,
+                resp.getWriter()
+        );
+
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String title = req.getParameter("selectedMovie");
+        String tickets = req.getParameter("numTickets");
+        resp.sendRedirect("/ticketOrder?title=" + title + "&tickets=" + tickets);
+
+    }
 }

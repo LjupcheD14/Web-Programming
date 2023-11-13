@@ -1,5 +1,6 @@
 package mk.finki.ukim.mk.lab.web;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,31 +12,35 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
 
-@WebServlet(name = "OrderConfirmationServlet", urlPatterns = {"/orderConfirmation"})
+@WebServlet(name = "MovieListServlet", urlPatterns = "/movieList")
 public class TicketOrderServlet extends HttpServlet {
+    private final SpringTemplateEngine springTemplateEngine;
 
-    private final SpringTemplateEngine templateEngine;  //za thymeleaf
-
-    public TicketOrderServlet(SpringTemplateEngine templateEngine) {
-        this.templateEngine = templateEngine;
+    public TicketOrderServlet(SpringTemplateEngine springTemplateEngine) {
+        this.springTemplateEngine = springTemplateEngine;
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String selectedMovie = request.getParameter("selectedMovie");
-        int numTickets = Integer.parseInt(request.getParameter("numTickets"));
-
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         IWebExchange webExchange = JakartaServletWebApplication
                 .buildApplication(getServletContext())
-                .buildExchange(request, response);
-        WebContext context = new WebContext(webExchange); //web context
+                .buildExchange(req, resp);
 
-        // proccess order save in database or repo if needed
+        WebContext context = new WebContext(webExchange);
 
-        context.setVariable("selectedMovie", selectedMovie);
-        context.setVariable("numTickets", numTickets);
+        context.setVariable("ipAddress", req.getRemoteAddr());
+        context.setVariable("title", req.getParameter("title"));
+        context.setVariable("tickets", req.getParameter("tickets"));
 
-        this.templateEngine.process("orderConfirmation.html", context, response.getWriter());
+        springTemplateEngine.process(
+                "orderConfirmation.html",
+                context,
+                resp.getWriter()
+        );
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
     }
 }

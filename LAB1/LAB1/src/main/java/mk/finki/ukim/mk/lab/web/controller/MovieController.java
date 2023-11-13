@@ -1,4 +1,4 @@
-package mk.finki.ukim.mk.lab.controller;
+package mk.finki.ukim.mk.lab.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import mk.finki.ukim.mk.lab.model.Movie;
 import mk.finki.ukim.mk.lab.service.MovieService;
-import org.springframework.web.bind.annotation.RequestParam;
-import mk.finki.ukim.mk.lab.service.implementation.MovieServiceImplementation;
 
 import java.util.List;
 
